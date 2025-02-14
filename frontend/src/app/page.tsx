@@ -6,8 +6,10 @@ import { MotionButtonComponent } from "@/components/MotionButton";
 import { RollingText } from "@/components/RollingText";
 import Timer from "@/components/Timer";
 import MusicPlayer from "@/components/MusicPlayer";
+import { fairyDustCursor } from "cursor-effects";
 
 export default function Home() {
+  
   const [isRunning, setIsRunning] = useState(false);
   const [activeTimer, setActiveTimer] = useState<string>("25 / 5"); // Default to 1 min work / 1 min rest
   const [minutes, setMinutes] = useState<number>(25); // Work time in minutes
@@ -74,6 +76,18 @@ export default function Home() {
   };
 
   const [hasWebGL, setHasWebGL] = useState(isWebGLAvailable());
+
+  useEffect(() => {
+    // Instantiate the fairyDustCursor with any options you like.
+    const cursor = fairyDustCursor() as any;
+
+    // Optional: return a cleanup function if you want to destroy the effect on unmount
+    return () => {
+      if (cursor && cursor.destroy) {
+        cursor.destroy();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setHasWebGL(isWebGLAvailable());
