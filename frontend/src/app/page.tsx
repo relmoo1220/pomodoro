@@ -117,13 +117,19 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full h-screen bg-primary text-secondary p-4 md:p-8">
       {/* Top Section */}
-      <div className="flex flex-col md:flex-row w-full md:h-2/3 space-y-6 md:space-y-0 md:items-start">
-        <div className="flex flex-col md:w-1/2 space-y-4 md:pl-12 md:pt-6 md:text-left">
+      <div className="flex flex-col md:flex-row w-full md:h-2/3 space-y-6 md:space-y-0 md:items-center">
+        <div
+          className={`flex flex-col ${
+            hasWebGL
+              ? "md:w-1/2 md:pl-12 md:pt-6"
+              : "md:w-full md:items-center w-full"
+          } space-y-4 md:text-left`}
+        >
           <RollingText
             text="Minimal Pomodoro"
             className="text-2xl md:text-2xl font-extrabold"
           />
-          <span className="text-sm md:text-base">
+          <span className="text-sm md:text-base md:w-[50%]">
             Stay focused and productive with Minimal Pomodoro. A simple,
             distraction-free tool to help you break work into manageable
             intervals with short breaks in between. Perfect for boosting
@@ -132,7 +138,11 @@ export default function Home() {
           </span>
           <MusicPlayer />
         </div>
-        <div className="w-full md:w-1/2 justify-center items-center hidden md:block">
+        <div
+          className={`justify-center items-center ${
+            hasWebGL ? "md:block md:w-1/2" : "hidden"
+          }`}
+        >
           {hasWebGL && <SortingHat />}
         </div>
       </div>

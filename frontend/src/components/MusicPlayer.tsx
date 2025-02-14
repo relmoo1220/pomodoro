@@ -105,14 +105,14 @@ const MusicPlayer = () => {
       </div>
 
       {/* Volume Slider */}
-      <div className="hidden md:block justify-center items-center mt-4 w-full">
+      <div className="md:flex justify-center items-center mt-4 w-full hidden md:block">
         <Slider
           value={[volume]}
           onValueChange={(newVolume) => handleVolumeChange(newVolume[0])} // Listen to the slider value change
           max={100}
           step={1}
           aria-label="Volume Control"
-          className="w-full md:w-3/4 bg-neutral-950"
+          className="w-3/4 bg-neutral-950"
         />
       </div>
     </div>
