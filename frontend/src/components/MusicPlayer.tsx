@@ -71,7 +71,7 @@ const MusicPlayer = () => {
   };
 
   return (
-    <div className="music-player flex flex-col w-[50%] items-center bg-neutral-800 p-4 rounded-lg">
+    <div className="music-player flex flex-col items-center bg-neutral-800 p-4 rounded-lg w-full max-w-lg">
       {/* SoundCloud Player */}
       <iframe
         ref={iframeRef}
@@ -79,42 +79,41 @@ const MusicPlayer = () => {
         height="100"
         allow="autoplay"
         src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1432527076&color=%238e24aa&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false&show_artwork=false"
+        className="rounded-lg max-w-full max-h-40 sm:max-h-48 md:max-h-60" // Add max-height and responsive scaling
       ></iframe>
 
       {/* Custom Controls */}
-      <div className="flex flex-col space-y-4">
-        <div className="controls mt-2 flex space-x-4">
-          <MotionButtonComponent
-            onClick={() => prevTrack()}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-400"
-          >
-            <SkipBack size={24} />
-          </MotionButtonComponent>
-          <MotionButtonComponent
-            onClick={togglePlayPause}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-400"
-          >
-            {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-          </MotionButtonComponent>
-          <MotionButtonComponent
-            onClick={() => nextTrack()}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-400"
-          >
-            <SkipForward size={24} />
-          </MotionButtonComponent>
-        </div>
+      <div className="controls mt-4 w-full flex justify-center items-center space-x-4 md:space-x-4 md:space-y-0">
+        <MotionButtonComponent
+          onClick={() => prevTrack()}
+          className="px-6 py-4 bg-purple-600 hover:bg-purple-400 rounded-full"
+        >
+          <SkipBack size={24} />
+        </MotionButtonComponent>
+        <MotionButtonComponent
+          onClick={togglePlayPause}
+          className="px-6 py-4 bg-purple-600 hover:bg-purple-400 rounded-full"
+        >
+          {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+        </MotionButtonComponent>
+        <MotionButtonComponent
+          onClick={() => nextTrack()}
+          className="px-6 py-4 bg-purple-600 hover:bg-purple-400 rounded-full"
+        >
+          <SkipForward size={24} />
+        </MotionButtonComponent>
+      </div>
 
-        {/* Volume Slider */}
-        <div className="flex justify-center items-center mt-4 w-full">
-          <Slider
-            value={[volume]}
-            onValueChange={(newVolume) => handleVolumeChange(newVolume[0])} // Listen to the slider value change
-            max={100}
-            step={1}
-            aria-label="Volume Control"
-            className="bg-neutral-950"
-          />
-        </div>
+      {/* Volume Slider */}
+      <div className="flex justify-center items-center mt-4 w-full">
+        <Slider
+          value={[volume]}
+          onValueChange={(newVolume) => handleVolumeChange(newVolume[0])} // Listen to the slider value change
+          max={100}
+          step={1}
+          aria-label="Volume Control"
+          className="w-full md:w-3/4 bg-neutral-950"
+        />
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import MusicPlayer from "@/components/MusicPlayer";
 export default function Home() {
   const [isRunning, setIsRunning] = useState(false);
   const [activeTimer, setActiveTimer] = useState<string>("25 / 5"); // Default to 1 min work / 1 min rest
-  const [minutes, setMinutes] = useState<number>(1); // Work time in minutes
+  const [minutes, setMinutes] = useState<number>(25); // Work time in minutes
   const [seconds, setSeconds] = useState<number>(0); // Seconds countdown
   const [isWorkPhase, setIsWorkPhase] = useState(true); // Flag for work/rest phase
 
@@ -51,16 +51,38 @@ export default function Home() {
       if (isWorkPhase) {
         setIsWorkPhase(false); // Switch to rest phase
         setMinutes(restTime); // Set rest phase time
-        speak("Rest time");
+        speak("Rest");
       } else {
         setIsWorkPhase(true); // Switch to work phase
         setMinutes(workTime); // Set work phase time
-        speak("Work time");
+        speak("Work");
       }
       setSeconds(0); // Reset seconds
       setIsRunning(true); // Start the next phase immediately
     }
   };
+
+  const isWebGLAvailable = () => {
+    try {
+      const canvas = document.createElement("canvas");
+      return !!(
+        canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+      );
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const [hasWebGL, setHasWebGL] = useState(isWebGLAvailable());
+
+  useEffect(() => {
+    setHasWebGL(isWebGLAvailable());
+  }, []);
+
+  useEffect(() => {
+    setMinutes(workTime);
+    setSeconds(0);
+  }, [activeTimer]);
 
   useEffect(() => {
     if (isRunning) {
@@ -93,14 +115,15 @@ export default function Home() {
   }, [minutes, seconds]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-primary text-secondary">
-      <div className="flex w-full h-3/5">
-        <div className="flex flex-col w-[50%] space-y-4 pl-12 pt-6">
+    <div className="flex flex-col w-full h-screen bg-primary text-secondary p-4 md:p-8">
+      {/* Top Section */}
+      <div className="flex flex-col md:flex-row w-full md:h-2/3 space-y-6 md:space-y-0 md:items-start">
+        <div className="flex flex-col md:w-1/2 space-y-4 md:pl-12 md:pt-6 md:text-left">
           <RollingText
             text="Minimal Pomodoro"
-            className="text-4xl font-extrabold"
+            className="text-2xl md:text-2xl font-extrabold"
           />
-          <span>
+          <span className="text-sm md:text-base">
             Stay focused and productive with Minimal Pomodoro. A simple,
             distraction-free tool to help you break work into manageable
             intervals with short breaks in between. Perfect for boosting
@@ -109,73 +132,75 @@ export default function Home() {
           </span>
           <MusicPlayer />
         </div>
-        <div className="w-[50%]">
-          <SortingHat />
+        <div className="w-full md:w-1/2 justify-center items-center hidden md:block">
+          {hasWebGL && <SortingHat />}
         </div>
       </div>
-      <div className="flex flex-col h-1/5 w-full justify-center items-center">
-        {/* Work/Rest Label */}
+
+      {/* Timer Section */}
+      <div className="flex flex-col h-[25%] w-full justify-center items-center space-y-4">
         <div
-          className={`w-[50%] justify-center items-center text-center font-extrabold text-lg border border-white ${
+          className={`w-full md:w-[50%] text-center font-extrabold text-lg border border-white p-2 rounded-md ${
             isWorkPhase ? "bg-green-600" : "bg-yellow-600"
           }`}
         >
           <span>{isWorkPhase ? "Work" : "Rest"}</span>
         </div>
-        {/* Timer */}
-        <div className="w-[50%] border border-white">
+        <div className="w-full md:w-[50%] border border-white p-4 rounded-md">
           <Timer minutes={minutes} seconds={seconds} />
         </div>
       </div>
-      <div className="flex flex-col h-1/5 w-full justify-center items-center">
-        <div className="flex h-1/2">
-          <div className="flex space-x-4">
+
+      {/* Button Section */}
+      <div className="flex flex-col h-[25%] w-full justify-center items-center space-y-6 mt-4">
+        <div className="flex flex-wrap justify-center space-x-2 md:space-x-4">
+          {[
+            {
+              label: "25 mins / 5 mins",
+              value: "25 / 5",
+              shortLabel: "25m / 5m",
+            },
+            {
+              label: "50 mins / 10 mins",
+              value: "50 / 10",
+              shortLabel: "50m / 10m",
+            },
+            {
+              label: "90 mins / 20 mins",
+              value: "90 / 20",
+              shortLabel: "90m / 20m",
+            },
+          ].map((option) => (
             <MotionButtonComponent
-              className={`${
-                activeTimer === "25 / 5"
+              key={option.value}
+              className={`w-24 sm:w-28 md:w-40 p-2 text-sm md:text-base font-extrabold rounded-md ${
+                activeTimer === option.value
                   ? "bg-purple-600 hover:bg-purple-400"
                   : "bg-purple-300 hover:bg-purple-200"
-              } font-extrabold w-40`}
-              onClick={() => setActiveTimer("25 / 5")}
+              } text-ellipsis overflow-hidden whitespace-nowrap`}
+              onClick={() => setActiveTimer(option.value)}
             >
-              25 mins / 5 mins
+              {/* Display the short label for mobile/tablet, and the full label for larger screens */}
+              <span className="block sm:hidden">{option.shortLabel}</span>
+              <span className="hidden sm:block">{option.label}</span>
             </MotionButtonComponent>
-            <MotionButtonComponent
-              className={`${
-                activeTimer === "50 / 10"
-                  ? "bg-purple-600 hover:bg-purple-400"
-                  : "bg-purple-300 hover:bg-purple-200"
-              } font-extrabold w-40`}
-              onClick={() => setActiveTimer("50 / 10")}
-            >
-              50 mins / 10 mins
-            </MotionButtonComponent>
-            <MotionButtonComponent
-              className={`${
-                activeTimer === "90 / 20"
-                  ? "bg-purple-600 hover:bg-purple-400"
-                  : "bg-purple-300 hover:bg-purple-200"
-              } font-extrabold w-40`}
-              onClick={() => setActiveTimer("90 / 20")}
-            >
-              90 mins / 20 mins
-            </MotionButtonComponent>
-          </div>
+          ))}
         </div>
-        <div className="w-full flex justify-center items-center space-x-12">
+
+        <div className="w-full flex flex-wrap justify-center items-center space-x-4">
           <MotionButtonComponent
-            className={`${
+            className={`px-6 py-2 text-sm md:text-base font-extrabold rounded-md ${
               isRunning
                 ? "bg-red-600 hover:bg-red-400"
                 : "bg-green-600 hover:bg-green-400"
-            } text-white font-extrabold px-8 py-3 rounded-md`}
+            } text-white`}
             onClick={handleToggleTimer}
           >
             {isRunning ? "Pause" : "Start"}
           </MotionButtonComponent>
 
           <MotionButtonComponent
-            className="bg-yellow-600 text-white font-extrabold hover:bg-yellow-400 px-8 py-3 rounded-md"
+            className="px-6 py-2 text-sm md:text-base font-extrabold bg-yellow-600 hover:bg-yellow-400 text-white rounded-md"
             onClick={resetTimer}
             disabled={isRunning}
           >
