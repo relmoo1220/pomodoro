@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import SortingHat from "@/components/SortingHat";
 import { MotionButtonComponent } from "@/components/MotionButton";
 import { RollingText } from "@/components/RollingText";
 import Timer from "@/components/Timer";
@@ -9,12 +8,11 @@ import MusicPlayer from "@/components/MusicPlayer";
 import { fairyDustCursor } from "cursor-effects";
 
 export default function Home() {
-  
   const [isRunning, setIsRunning] = useState(false);
-  const [activeTimer, setActiveTimer] = useState<string>("25 / 5"); // Default to 1 min work / 1 min rest
-  const [minutes, setMinutes] = useState<number>(25); // Work time in minutes
-  const [seconds, setSeconds] = useState<number>(0); // Seconds countdown
-  const [isWorkPhase, setIsWorkPhase] = useState(true); // Flag for work/rest phase
+  const [activeTimer, setActiveTimer] = useState<string>("25 / 5");
+  const [minutes, setMinutes] = useState<number>(25);
+  const [seconds, setSeconds] = useState<number>(0);
+  const [isWorkPhase, setIsWorkPhase] = useState(true);
 
   const speak = (message: string) => {
     const utterance = new SpeechSynthesisUtterance(message);
@@ -27,70 +25,42 @@ export default function Home() {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Timer toggle (Start/Pause)
   const handleToggleTimer = () => {
     setIsRunning((prev) => !prev);
-    if (isRunning) {
-      speak("Pause");
-    } else {
-      speak("Start");
-    }
+    speak(isRunning ? "Pause" : "Start");
   };
 
-  // Reset the timer
   const resetTimer = () => {
-    setIsRunning(false); // Stop the timer
+    setIsRunning(false);
     setIsWorkPhase(true);
-    setMinutes(workTime); // Set the initial time based on phase
-    setSeconds(0); // Reset seconds to 0
-    if (intervalRef.current) clearInterval(intervalRef.current); // Clear any existing interval
+    setMinutes(workTime);
+    setSeconds(0);
+    if (intervalRef.current) clearInterval(intervalRef.current);
   };
 
-  // Handle timer completion (Switch phases)
   const handleTimerComplete = () => {
     if (minutes === 0 && seconds === 0) {
-      // Switch phases
       if (isWorkPhase) {
-        setIsWorkPhase(false); // Switch to rest phase
-        setMinutes(restTime); // Set rest phase time
+        setIsWorkPhase(false);
+        setMinutes(restTime);
         speak("Rest");
       } else {
-        setIsWorkPhase(true); // Switch to work phase
-        setMinutes(workTime); // Set work phase time
+        setIsWorkPhase(true);
+        setMinutes(workTime);
         speak("Work");
       }
-      setSeconds(0); // Reset seconds
-      setIsRunning(true); // Start the next phase immediately
+      setSeconds(0);
+      setIsRunning(true);
     }
   };
-
-  const isWebGLAvailable = () => {
-    try {
-      const canvas = document.createElement("canvas");
-      return !!(
-        canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
-      );
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const [hasWebGL, setHasWebGL] = useState(isWebGLAvailable());
 
   useEffect(() => {
-    // Instantiate the fairyDustCursor with any options you like.
     const cursor = fairyDustCursor() as any;
-
-    // Optional: return a cleanup function if you want to destroy the effect on unmount
     return () => {
       if (cursor && cursor.destroy) {
         cursor.destroy();
       }
     };
-  }, []);
-
-  useEffect(() => {
-    setHasWebGL(isWebGLAvailable());
   }, []);
 
   useEffect(() => {
@@ -102,15 +72,13 @@ export default function Home() {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
         setSeconds((prevSeconds) => {
-          if (prevSeconds === 0) {
-            return 59; // Reset seconds first
-          }
+          if (prevSeconds === 0) return 59;
           return prevSeconds - 1;
         });
 
-        setMinutes((prevMinutes) => {
-          return seconds === 0 ? Math.max(prevMinutes - 1, 0) : prevMinutes;
-        });
+        setMinutes((prevMinutes) =>
+          seconds === 0 ? Math.max(prevMinutes - 1, 0) : prevMinutes
+        );
       }, 1000);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -121,7 +89,6 @@ export default function Home() {
     };
   }, [isRunning, seconds]);
 
-  // Separate useEffect to handle phase switching exactly once
   useEffect(() => {
     if (minutes === 0 && seconds === 0) {
       handleTimerComplete();
@@ -129,21 +96,14 @@ export default function Home() {
   }, [minutes, seconds]);
 
   return (
-    <div className="flex flex-col w-full h-screen bg-primary text-secondary p-4 md:p-8">
-      {/* Top Section */}
-      <div className="flex flex-col md:flex-row w-full md:h-2/3 space-y-6 md:space-y-0 md:items-center">
-        <div
-          className={`flex flex-col ${
-            hasWebGL
-              ? "md:w-1/2 md:pl-12 md:pt-6"
-              : "md:w-full md:items-center w-full"
-          } space-y-4 md:text-left`}
-        >
+    <div className="flex flex-col w-full h-screen bg-primary text-secondary p-4 lg:p-8">
+      <div className="flex flex-col lg:flex-row w-full lg:h-2/3 space-y-6 lg:space-y-0 lg:items-center">
+        <div className="flex flex-col lg:w-full lg:items-center w-full space-y-4 lg:text-left">
           <RollingText
             text="Minimal Pomodoro"
-            className="text-2xl md:text-2xl font-extrabold"
+            className="text-2xl lg:text-2xl font-extrabold"
           />
-          <span className="text-sm md:text-base md:w-[50%]">
+          <span className="text-sm lg:text-base lg:w-[50%]">
             Stay focused and productive with Minimal Pomodoro. A simple,
             distraction-free tool to help you break work into manageable
             intervals with short breaks in between. Perfect for boosting
@@ -152,32 +112,23 @@ export default function Home() {
           </span>
           <MusicPlayer />
         </div>
-        <div
-          className={`justify-center items-center ${
-            hasWebGL ? "md:block md:w-1/2" : "hidden"
-          }`}
-        >
-          {hasWebGL && <SortingHat />}
-        </div>
       </div>
 
-      {/* Timer Section */}
-      <div className="flex flex-col h-[25%] w-full justify-center items-center space-y-4">
+      <div className="flex flex-col h-[25%] w-full justify-center items-center space-y-4 mt-10 xl:mb-6">
         <div
-          className={`w-full md:w-[50%] text-center font-extrabold text-lg border border-white p-2 rounded-md ${
+          className={`w-full lg:w-[50%] text-center font-extrabold text-lg border border-white p-2 rounded-md ${
             isWorkPhase ? "bg-green-600" : "bg-yellow-600"
           }`}
         >
           <span>{isWorkPhase ? "Work" : "Rest"}</span>
         </div>
-        <div className="w-full md:w-[50%] border border-white p-4 rounded-md">
+        <div className="w-[50%] border border-white p-4 rounded-md">
           <Timer minutes={minutes} seconds={seconds} />
         </div>
       </div>
 
-      {/* Button Section */}
       <div className="flex flex-col h-[25%] w-full justify-center items-center space-y-6 mt-4">
-        <div className="flex flex-wrap justify-center space-x-2 md:space-x-4">
+        <div className="flex flex-wrap justify-center space-x-2 lg:space-x-4">
           {[
             {
               label: "25 mins / 5 mins",
@@ -197,23 +148,21 @@ export default function Home() {
           ].map((option) => (
             <MotionButtonComponent
               key={option.value}
-              className={`w-24 sm:w-28 md:w-40 p-2 text-sm md:text-base font-extrabold rounded-md ${
+              className={`w-24 sm:w-28 lg:w-40 p-2 text-sm lg:text-base font-extrabold rounded-md ${
                 activeTimer === option.value
                   ? "bg-purple-600 hover:bg-purple-400"
                   : "bg-purple-300 hover:bg-purple-200"
               } text-ellipsis overflow-hidden whitespace-nowrap`}
               onClick={() => setActiveTimer(option.value)}
             >
-              {/* Display the short label for mobile/tablet, and the full label for larger screens */}
               <span className="block sm:hidden">{option.shortLabel}</span>
               <span className="hidden sm:block">{option.label}</span>
             </MotionButtonComponent>
           ))}
         </div>
-
         <div className="w-full flex flex-wrap justify-center items-center space-x-4">
           <MotionButtonComponent
-            className={`px-6 py-2 text-sm md:text-base font-extrabold rounded-md ${
+            className={`px-6 py-2 text-sm lg:text-base font-extrabold rounded-md ${
               isRunning
                 ? "bg-red-600 hover:bg-red-400"
                 : "bg-green-600 hover:bg-green-400"
@@ -224,7 +173,7 @@ export default function Home() {
           </MotionButtonComponent>
 
           <MotionButtonComponent
-            className="px-6 py-2 text-sm md:text-base font-extrabold bg-yellow-600 hover:bg-yellow-400 text-white rounded-md"
+            className="px-6 py-2 text-sm lg:text-base font-extrabold bg-yellow-600 hover:bg-yellow-400 text-white rounded-md"
             onClick={resetTimer}
             disabled={isRunning}
           >

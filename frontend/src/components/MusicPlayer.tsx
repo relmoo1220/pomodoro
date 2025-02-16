@@ -105,7 +105,7 @@ const MusicPlayer = () => {
       </div>
 
       {/* Volume Slider */}
-      <div className="md:flex justify-center items-center mt-4 w-full hidden md:block">
+      <div className="hidden xl:flex justify-center w-full mt-4">
         <Slider
           value={[volume]}
           onValueChange={(newVolume) => handleVolumeChange(newVolume[0])} // Listen to the slider value change

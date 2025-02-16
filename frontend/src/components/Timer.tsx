@@ -16,7 +16,7 @@ export default function Timer({
 }: TimerProps) {
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      <div className="text-8xl font-bold tabular-nums flex space-x-2">
+      <div className="xl:text-8xl text-2xl font-bold tabular-nums flex space-x-2">
         <AnimatedCount value={minutes} padding={2} />
         <span>:</span>
         <AnimatedCount value={seconds} padding={2} />
